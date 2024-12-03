@@ -1,3 +1,5 @@
+mod days;
+
 fn main() {
-    println!("Hello, world!");
+    let _  = days::day01::solve();
 }
