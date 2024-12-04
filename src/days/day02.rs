@@ -35,20 +35,20 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
 
 fn monotone_check(levels: &Vec<i32>) -> bool {
     let mut check: bool = false;
-    let mut gradients: Vec<GRADIENT> = Vec::new();
+    let mut gradients: Vec<Gradient> = Vec::new();
 
     for i in 1..levels.len() {
         if levels[i] < levels[i - 1] {
-            gradients.push(GRADIENT::DOWN)
+            gradients.push(Gradient::DOWN)
         }
         if levels[i] > levels[i - 1] {
-            gradients.push(GRADIENT::UP)
+            gradients.push(Gradient::UP)
         }
     }
 
     // all adjacent pairs are monotone
-    if gradients.iter().all(|dir| matches!(dir, GRADIENT::UP)) ||
-        gradients.iter().all(|dir| matches!(dir, GRADIENT::DOWN)) {
+    if gradients.iter().all(|dir| matches!(dir, Gradient::UP)) ||
+        gradients.iter().all(|dir| matches!(dir, Gradient::DOWN)) {
         check = true;
     }
 
@@ -101,7 +101,7 @@ fn read_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
 }
 
 #[derive(Debug)]
-enum GRADIENT {
+enum Gradient {
     UP,
     DOWN,
 }
