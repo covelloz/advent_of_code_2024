@@ -17,18 +17,49 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
     };
 
     let mut safe_count: i32 = 0;
+    let mut tolerant_count: i32 = 0;
 
     for i in 0..reports.len() {
         let levels = &reports[i];
         let monotone = monotone_check(levels);
         let bounded = bounded_check(levels);
 
+        // === Part 1 ===
         if monotone && bounded {
             safe_count += 1;
+        } else {
+            // === Part 2 ===
+            // TODO: this algorithm seems extremely brute-force-ish; try to optimize? O(NxM^3)
+            // TODO: early break helps optimize it a bit at least
+            let mut tolerant_without_level: Vec<bool> = Vec::new();
+
+            for j in 0..levels.len() {
+                // quarantine each level; re-check safety without it
+                let quarantine: Vec<i32> = levels.iter()
+                    .enumerate()
+                    .filter_map(|(idx, &num)| {
+                        if j == idx { None } else { Some(num) }
+                    })
+                    .collect();
+
+                let monotone_tolerant = monotone_check(&quarantine);
+                let bounded_tolerant = bounded_check(&quarantine);
+                tolerant_without_level.push(monotone_tolerant && bounded_tolerant);
+
+                if monotone_tolerant && bounded_tolerant {
+                    break;
+                }
+            }
+
+            // tolerance: safe with at least one level removed
+            if tolerant_without_level.iter().any(|&tol| tol) {
+                tolerant_count += 1;
+            }
         }
     }
 
     println!("Part1::Answer: {}", safe_count);
+    println!("Part2::Answer: {}", safe_count + tolerant_count);
 
     Ok(())
 }
