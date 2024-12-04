@@ -4,45 +4,13 @@ use std::error::Error;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
-pub fn read_input() -> Result<(Vec<i32>, Vec<i32>), Box<dyn Error>> {
-    let current_dir: PathBuf = env::current_dir().unwrap();
-    let root: &Path = Path::new(current_dir.to_str().unwrap());
-    let path: PathBuf = root.join("src/resources/day01/day01.tsv");
-
-    let mut reader: Reader<File> = ReaderBuilder::new()
-        .delimiter(b'\t')
-        .has_headers(false)
-        .from_path(path)?;
-
-    let mut column_1: Vec<i32> = Vec::new();
-    let mut column_2: Vec<i32> = Vec::new();
-
-    for result in reader.records() {
-        let record = result?;
-
-        if let Some(field_1) = record.get(0) {
-            if let Ok(num) = field_1.parse::<i32>() {
-                column_1.push(num)
-            }
-        }
-
-        if let Some(field_2) = record.get(1) {
-            if let Ok(num) = field_2.parse::<i32>() {
-                column_2.push(num);
-            }
-        }
-    }
-
-    Ok((column_1, column_2))
-}
-
 pub fn solve() -> Result<(), Box<dyn Error>> {
     println!("\nDAY 01");
     println!("------");
     let (mut list_1, mut list_2) = match read_input() {
         Ok((list_1, list_2)) => (list_1, list_2),
         Err(e) => {
-            println!("Error reading CSV input:\n  {}", e);
+            eprintln!("Error reading TSV input:\n  {}", e);
             return Err(e.into());
         }
     };
@@ -63,7 +31,7 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
 
     // sum of distances
     let sum_diff: i32 = list_diff.iter().sum();
-    println!("Part 1 answer: {}", sum_diff);
+    println!("Part1::Answer: {}", sum_diff);
 
     // === Part 2 ===
     // calculate similarity score
@@ -83,7 +51,38 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
 
     // sum of similarity scores
     let sum_sim: i32 = list_sim.iter().sum();
-    println!("Part 2 answer: {}", sum_sim);
+    println!("Part2::Answer: {}", sum_sim);
 
     Ok(())
+}
+
+fn read_input() -> Result<(Vec<i32>, Vec<i32>), Box<dyn Error>> {
+    let current_dir: PathBuf = env::current_dir().unwrap();
+    let root: &Path = Path::new(current_dir.to_str().unwrap());
+    let path: PathBuf = root.join("src/resources/day01/day01.tsv");
+
+    let mut reader: Reader<File> = ReaderBuilder::new()
+        .delimiter(b'\t')
+        .has_headers(false)
+        .from_path(path)?;
+
+    let mut column_1: Vec<i32> = Vec::new();
+    let mut column_2: Vec<i32> = Vec::new();
+
+    for result in reader.records() {
+        let record = result?;
+
+        record.iter()
+            .filter_map(|field| field.trim().parse::<i32>().ok())
+            .enumerate()
+            .for_each(|(idx, num)| {
+                match idx {
+                    0 => column_1.push(num),
+                    1 => column_2.push(num),
+                    _ => {}
+                }
+            })
+    }
+
+    Ok((column_1, column_2))
 }
