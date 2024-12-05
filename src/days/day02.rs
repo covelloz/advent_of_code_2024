@@ -20,9 +20,9 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
     let mut tolerant_count: i32 = 0;
 
     for i in 0..reports.len() {
-        let levels = &reports[i];
-        let monotone = monotone_check(levels);
-        let bounded = bounded_check(levels);
+        let levels: &Vec<i32> = &reports[i];
+        let monotone: bool = monotone_check(levels);
+        let bounded: bool = bounded_check(levels);
 
         // === Part 1 ===
         if monotone && bounded {
@@ -42,8 +42,8 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
                     })
                     .collect();
 
-                let monotone_tolerant = monotone_check(&quarantine);
-                let bounded_tolerant = bounded_check(&quarantine);
+                let monotone_tolerant: bool = monotone_check(&quarantine);
+                let bounded_tolerant: bool = bounded_check(&quarantine);
                 tolerant_without_level.push(monotone_tolerant && bounded_tolerant);
 
                 if monotone_tolerant && bounded_tolerant {
