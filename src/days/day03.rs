@@ -9,9 +9,7 @@ pub fn solve() {
     println!("------");
 
     let memory: String = match read_input() {
-        Ok(content) => {
-            content
-        }
+        Ok(content) => content,
         Err(e) => {
             eprintln!("Error reading file:\n  {}", e);
             return;
@@ -24,7 +22,8 @@ pub fn solve() {
     let num_pairs: Vec<(i32, i32)> = capture_pairs(&memory, &re);
 
     // === Part 1 ===
-    let products: Vec<i32> = num_pairs.iter()
+    let products: Vec<i32> = num_pairs
+        .iter()
         .map(|&(first, second)| first * second)
         .collect();
     let total: i32 = products.iter().sum();
@@ -37,13 +36,13 @@ pub fn solve() {
 
     recursive_search(&memory, init_keyword, &mut mem_parts_to_process);
 
-    let num_pairs2: Vec<(i32, i32)> = mem_parts_to_process.iter()
-        .flat_map(|mem_part| {
-            capture_pairs(mem_part, &re)
-        })
+    let num_pairs2: Vec<(i32, i32)> = mem_parts_to_process
+        .iter()
+        .flat_map(|mem_part| capture_pairs(mem_part, &re))
         .collect();
 
-    let products2: Vec<i32> = num_pairs2.iter()
+    let products2: Vec<i32> = num_pairs2
+        .iter()
         .map(|&(first, second)| first * second)
         .collect();
     let total2: i32 = products2.iter().sum();
@@ -51,22 +50,22 @@ pub fn solve() {
     println!("Part2::Answer: {}", total2);
 }
 
-fn recursive_search(
-    text: &str,
-    keyword: &str,
-    accumulator: &mut Vec<String>,
-) -> String {
+fn recursive_search(text: &str, keyword: &str, accumulator: &mut Vec<String>) -> String {
     let position: Option<usize> = text.find(keyword);
 
     if let Some(pos) = position {
-        let (p1 , p2): (&str, &str) = text.split_at(pos);
+        let (p1, p2): (&str, &str) = text.split_at(pos);
         let p2: &str = &p2[keyword.len()..]; // remove keyword
 
         if keyword == "don't()" {
             accumulator.push(p1.to_string())
         }
 
-        let next_keyword: &str = if keyword == "don't()" { "do()" } else { "don't()" };
+        let next_keyword: &str = if keyword == "don't()" {
+            "do()"
+        } else {
+            "don't()"
+        };
 
         return recursive_search(p2, next_keyword, accumulator);
     }
@@ -89,7 +88,7 @@ fn capture_pairs(memory: &String, re: &Regex) -> Vec<(i32, i32)> {
 }
 
 fn read_input() -> Result<String, io::Error> {
-    let current_dir: PathBuf = env::current_dir().unwrap();
+    let current_dir: PathBuf = env::current_dir()?;
     let root: &Path = Path::new(current_dir.to_str().unwrap());
     let path: PathBuf = root.join("src/resources/day03/day03.txt");
 
