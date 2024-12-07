@@ -1,4 +1,4 @@
-use csv::{Reader, ReaderBuilder};
+use csv::{Reader, ReaderBuilder, StringRecord};
 use std::env;
 use std::error::Error;
 use std::fs::File;
@@ -15,7 +15,7 @@ pub fn solve() {
             return;
         }
     };
-    let word_grid = WordGrid { rows, cols };
+    let word_grid = CharGrid { rows, cols };
 
     let mut count: usize = 0;
     let word_match: String = String::from("XMAS");
@@ -29,7 +29,7 @@ pub fn solve() {
 }
 
 fn orthogonal_search(
-    grid: &WordGrid,
+    grid: &CharGrid,
     word_match: &str,
     window_size: usize,
     direction: CardinalDirection,
@@ -75,7 +75,9 @@ fn orthogonal_search(
     count
 }
 
-/// creates a "WordGrid" of characters using vectors, i.e:
+/// Creates a "CharGrid" of characters using vectors.
+/// **Assumption**: all rows have the same number of characters.
+/// i.e:
 ///     XMASAMX
 ///     XMASAMX
 /// parses as:
@@ -95,11 +97,12 @@ fn read_input() -> Result<(Vec<Vec<char>>, Vec<Vec<char>>), Box<dyn Error>> {
     let mut cols: Vec<Vec<char>> = Vec::new();
 
     for result in reader.records() {
-        let record = result?;
+        let record: StringRecord = result?;
+        // deconstruct into chars
         rows = record.iter().map(|field| field.chars().collect()).collect();
     }
 
-    let max_cols: usize = rows[0].len();
+    let max_cols: usize = rows[0].len(); // note: ref assumption in docstring
     for i in 0..max_cols {
         let mut col: Vec<char> = vec![' '; rows.len()];
 
@@ -114,7 +117,7 @@ fn read_input() -> Result<(Vec<Vec<char>>, Vec<Vec<char>>), Box<dyn Error>> {
 }
 
 #[derive(Debug)]
-struct WordGrid {
+struct CharGrid {
     rows: Vec<Vec<char>>,
     cols: Vec<Vec<char>>,
 }
