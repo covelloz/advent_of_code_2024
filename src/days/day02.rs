@@ -8,7 +8,7 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
     println!("\nDAY 02");
     println!("------");
 
-    let reports: Vec<Vec<i32>> = match read_input() {
+    let reports: Vec<Vec<isize>> = match read_input() {
         Ok(rows) => rows,
         Err(e) => {
             eprintln!("Error reading TSV input:\n  {}", e);
@@ -16,11 +16,11 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
         }
     };
 
-    let mut safe_count: i32 = 0;
-    let mut tolerant_count: i32 = 0;
+    let mut safe_count: usize = 0;
+    let mut tolerant_count: usize = 0;
 
     for i in 0..reports.len() {
-        let levels: &Vec<i32> = &reports[i];
+        let levels: &Vec<isize> = &reports[i];
         let monotone: bool = monotone_check(levels);
         let bounded: bool = bounded_check(levels);
 
@@ -35,7 +35,7 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
 
             for j in 0..levels.len() {
                 // quarantine each level; re-check safety without it
-                let quarantine: Vec<i32> = levels
+                let quarantine: Vec<isize> = levels
                     .iter()
                     .enumerate()
                     .filter_map(|(idx, &num)| if j == idx { None } else { Some(num) })
@@ -63,7 +63,7 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn monotone_check(levels: &Vec<i32>) -> bool {
+fn monotone_check(levels: &Vec<isize>) -> bool {
     let mut check: bool = false;
     let mut gradients: Vec<Gradient> = Vec::new();
 
@@ -86,9 +86,9 @@ fn monotone_check(levels: &Vec<i32>) -> bool {
     check
 }
 
-fn bounded_check(levels: &Vec<i32>) -> bool {
+fn bounded_check(levels: &Vec<isize>) -> bool {
     let mut check: bool = false;
-    let mut distances: Vec<i32> = Vec::new();
+    let mut distances: Vec<isize> = Vec::new();
 
     for i in 1..levels.len() {
         let dist = (levels[i] - levels[i - 1]).abs();
@@ -103,7 +103,7 @@ fn bounded_check(levels: &Vec<i32>) -> bool {
     check
 }
 
-fn read_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
+fn read_input() -> Result<Vec<Vec<isize>>, Box<dyn Error>> {
     let current_dir: PathBuf = env::current_dir().unwrap();
     let root: &Path = Path::new(current_dir.to_str().unwrap());
     let path: PathBuf = root.join("src/resources/day02/day02.tsv");
@@ -114,7 +114,7 @@ fn read_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
         .flexible(true)
         .from_path(path)?;
 
-    let mut rows: Vec<Vec<i32>> = Vec::new();
+    let mut rows: Vec<Vec<isize>> = Vec::new();
 
     for result in reader.records() {
         let record: StringRecord = result?;
@@ -125,7 +125,7 @@ fn read_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
             .collect();
 
         if !row.is_empty() {
-            rows.push(row)
+            rows.push(row.iter().map(|&x| x as isize).collect())
         }
     }
 

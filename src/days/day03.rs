@@ -19,14 +19,14 @@ pub fn solve() {
     let pattern: &str = r"mul\((\d+),(\d+)\)";
     let re: Regex = Regex::new(pattern).unwrap();
 
-    let num_pairs: Vec<(i32, i32)> = capture_pairs(&memory, &re);
+    let num_pairs: Vec<(isize, isize)> = capture_pairs(&memory, &re);
 
     // === Part 1 ===
-    let products: Vec<i32> = num_pairs
+    let products: Vec<isize> = num_pairs
         .iter()
         .map(|&(first, second)| first * second)
         .collect();
-    let total: i32 = products.iter().sum();
+    let total: isize = products.iter().sum();
 
     println!("Part1::Answer: {}", total);
 
@@ -36,16 +36,16 @@ pub fn solve() {
 
     recursive_search(&memory, init_keyword, &mut mem_parts_to_process);
 
-    let num_pairs2: Vec<(i32, i32)> = mem_parts_to_process
+    let num_pairs2: Vec<(isize, isize)> = mem_parts_to_process
         .iter()
         .flat_map(|mem_part| capture_pairs(mem_part, &re))
         .collect();
 
-    let products2: Vec<i32> = num_pairs2
+    let products2: Vec<isize> = num_pairs2
         .iter()
         .map(|&(first, second)| first * second)
         .collect();
-    let total2: i32 = products2.iter().sum();
+    let total2: isize = products2.iter().sum();
 
     println!("Part2::Answer: {}", total2);
 }
@@ -77,11 +77,11 @@ fn recursive_search(text: &str, keyword: &str, accumulator: &mut Vec<String>) ->
     text.to_string()
 }
 
-fn capture_pairs(memory: &String, re: &Regex) -> Vec<(i32, i32)> {
+fn capture_pairs(memory: &String, re: &Regex) -> Vec<(isize, isize)> {
     re.captures_iter(memory)
         .filter_map(|caps| {
-            let first: i32 = caps.get(1)?.as_str().parse().ok()?;
-            let second: i32 = caps.get(2)?.as_str().parse().ok()?;
+            let first: isize = caps.get(1)?.as_str().parse().ok()?;
+            let second: isize = caps.get(2)?.as_str().parse().ok()?;
             Some((first, second))
         })
         .collect()

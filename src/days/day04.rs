@@ -31,7 +31,7 @@ pub fn solve() {
 fn orthogonal_search(
     grid: &CharGrid,
     word_match: &str,
-    window_size: usize,
+    window_size: u32,
     direction: CardinalDirection,
     mut count: usize,
 ) -> usize {
@@ -42,7 +42,8 @@ fn orthogonal_search(
 
             for row in text_to_scan {
                 for i in 0..row.len() {
-                    let scan_window: String = row.iter().skip(i).take(window_size).collect();
+                    let scan_window: String =
+                        row.iter().skip(i).take(window_size as usize).collect();
 
                     if scan_window.contains(word_match) {
                         count += 1;
@@ -56,7 +57,12 @@ fn orthogonal_search(
 
             for row in text_to_scan {
                 for i in 0..row.len() {
-                    let scan_window: String = row.iter().rev().skip(i).take(window_size).collect();
+                    let scan_window: String = row
+                        .iter()
+                        .rev()
+                        .skip(i)
+                        .take(window_size as usize)
+                        .collect();
 
                     if scan_window.contains(word_match) {
                         count += 1;
