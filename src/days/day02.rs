@@ -35,11 +35,10 @@ pub fn solve() -> Result<(), Box<dyn Error>> {
 
             for j in 0..levels.len() {
                 // quarantine each level; re-check safety without it
-                let quarantine: Vec<i32> = levels.iter()
+                let quarantine: Vec<i32> = levels
+                    .iter()
                     .enumerate()
-                    .filter_map(|(idx, &num)| {
-                        if j == idx { None } else { Some(num) }
-                    })
+                    .filter_map(|(idx, &num)| if j == idx { None } else { Some(num) })
                     .collect();
 
                 let monotone_tolerant: bool = monotone_check(&quarantine);
@@ -70,20 +69,21 @@ fn monotone_check(levels: &Vec<i32>) -> bool {
 
     for i in 1..levels.len() {
         if levels[i] < levels[i - 1] {
-            gradients.push(Gradient::DOWN)
+            gradients.push(Gradient::Down)
         }
         if levels[i] > levels[i - 1] {
-            gradients.push(Gradient::UP)
+            gradients.push(Gradient::Up)
         }
     }
 
     // all adjacent pairs are monotone
-    if gradients.iter().all(|dir| matches!(dir, Gradient::UP)) ||
-        gradients.iter().all(|dir| matches!(dir, Gradient::DOWN)) {
+    if gradients.iter().all(|dir| matches!(dir, Gradient::Up))
+        || gradients.iter().all(|dir| matches!(dir, Gradient::Down))
+    {
         check = true;
     }
 
-   check
+    check
 }
 
 fn bounded_check(levels: &Vec<i32>) -> bool {
@@ -91,7 +91,7 @@ fn bounded_check(levels: &Vec<i32>) -> bool {
     let mut distances: Vec<i32> = Vec::new();
 
     for i in 1..levels.len() {
-        let dist = (levels[i] - levels[i-1]).abs();
+        let dist = (levels[i] - levels[i - 1]).abs();
         distances.push(dist);
     }
 
@@ -119,7 +119,8 @@ fn read_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
     for result in reader.records() {
         let record: StringRecord = result?;
 
-        let row: Vec<i32> = record.iter()
+        let row: Vec<i32> = record
+            .iter()
             .filter_map(|field| field.trim().parse::<i32>().ok())
             .collect();
 
@@ -133,6 +134,6 @@ fn read_input() -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
 
 #[derive(Debug)]
 enum Gradient {
-    UP,
-    DOWN,
+    Up,
+    Down,
 }
