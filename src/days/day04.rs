@@ -22,8 +22,8 @@ pub fn solve() {
 
     count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::East, count);
     count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::West, count);
-    count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::North, count);
     count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::South, count);
+    count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::North, count);
 
     println!("Part1::Answer: {}", count)
 }
@@ -64,10 +64,10 @@ fn orthogonal_search(
                 }
             }
         }
-        CardinalDirection::North => {
+        CardinalDirection::South => {
             let _text_to_scan: &Vec<Vec<char>> = &grid.cols;
         }
-        CardinalDirection::South => {
+        CardinalDirection::North => {
             let _text_to_scan: &Vec<Vec<char>> = &grid.cols;
         }
     }
