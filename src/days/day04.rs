@@ -25,7 +25,10 @@ pub fn solve() {
     count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::South, count);
     count = orthogonal_search(&word_grid, &word_match, 4, CardinalDirection::North, count);
 
-    println!("Part1::Answer: {}", count)
+    let diagonals = get_diagonals(&word_grid, Orientation::LeftRightDiagonal);
+
+    println!("Part1::Answer: {}", count);
+    println!("LeftRightDiagonals: {:?}", diagonals);
 }
 
 fn orthogonal_search(
@@ -38,47 +41,114 @@ fn orthogonal_search(
     match direction {
         CardinalDirection::East => {
             // forwards horizontal search
-            let text_to_scan: &Vec<Vec<char>> = &grid.rows;
-
-            for row in text_to_scan {
-                for i in 0..row.len() {
-                    let scan_window: String =
-                        row.iter().skip(i).take(window_size as usize).collect();
-
-                    if scan_window.contains(word_match) {
-                        count += 1;
-                    }
-                }
-            }
+            count = forward_search(&grid.rows, window_size, word_match, count)
         }
         CardinalDirection::West => {
             // backwards horizontal search
-            let text_to_scan: &Vec<Vec<char>> = &grid.rows;
-
-            for row in text_to_scan {
-                for i in 0..row.len() {
-                    let scan_window: String = row
-                        .iter()
-                        .rev()
-                        .skip(i)
-                        .take(window_size as usize)
-                        .collect();
-
-                    if scan_window.contains(word_match) {
-                        count += 1;
-                    }
-                }
-            }
+            count = backward_search(&grid.rows, window_size, word_match, count)
         }
         CardinalDirection::South => {
-            let _text_to_scan: &Vec<Vec<char>> = &grid.cols;
+            // forwards vertical search
+            count = forward_search(&grid.cols, window_size, word_match, count)
         }
         CardinalDirection::North => {
-            let _text_to_scan: &Vec<Vec<char>> = &grid.cols;
+            // backwards vertical search
+            count = backward_search(&grid.cols, window_size, word_match, count)
         }
     }
 
     count
+}
+
+fn forward_search(
+    texts_to_scan: &Vec<Vec<char>>,
+    window_size: u32,
+    word_match: &str,
+    mut count: usize,
+) -> usize {
+    for text in texts_to_scan {
+        for i in 0..text.len() {
+            let scan_window: String = text.iter().skip(i).take(window_size as usize).collect();
+
+            if scan_window.contains(word_match) {
+                count += 1;
+            }
+        }
+    }
+
+    count
+}
+
+fn backward_search(
+    texts_to_scan: &Vec<Vec<char>>,
+    window_size: u32,
+    word_match: &str,
+    mut count: usize,
+) -> usize {
+    for text in texts_to_scan {
+        for i in 0..text.len() {
+            let scan_window: String = text
+                .iter()
+                .rev()
+                .skip(i)
+                .take(window_size as usize)
+                .collect();
+
+            if scan_window.contains(word_match) {
+                count += 1;
+            }
+        }
+    }
+
+    count
+}
+
+fn get_diagonals(grid: &CharGrid, orient: Orientation) -> Vec<Vec<char>> {
+    let num_of_rows: usize = grid.rows.len();
+    let num_of_cols: usize = grid.cols.len();
+
+    let mut diagonal: Vec<char> = Vec::new();
+    let mut diagonals: Vec<Vec<char>> = Vec::new();
+
+    match orient {
+        Orientation::LeftRightDiagonal => {
+            for i in 0..num_of_rows {
+                diagonal = Vec::new();
+
+                let mut walk_i: usize = i;
+                let mut walk_j: usize = 0;
+
+                while walk_i <= (num_of_rows - 1) && walk_j <= (num_of_cols - 1) {
+                    diagonal.push(grid.rows[walk_i][walk_j]);
+                    walk_i += 1;
+                    walk_j += 1;
+                }
+
+                println!("row iter {}, diagonal {:?}", i, diagonal);
+                diagonals.push(diagonal)
+            }
+
+            for j in 1..num_of_cols {
+                // skip 0 because main-diagonal handled by row-loop
+                diagonal = Vec::new();
+
+                let mut walk_i: usize = 0;
+                let mut walk_j: usize = j;
+
+                while walk_i <= (num_of_rows - 1) && walk_j <= (num_of_cols - 1) {
+                    diagonal.push(grid.rows[walk_i][walk_j]);
+                    walk_i += 1;
+                    walk_j += 1;
+                }
+
+                println!("col iter {}, diagonal {:?}", j, diagonal);
+                diagonals.push(diagonal)
+            }
+        }
+        Orientation::RightLeftDiagonal => {}
+    }
+
+    diagonals
 }
 
 /// Creates a "CharGrid" of characters using vectors.
@@ -136,10 +206,8 @@ enum CardinalDirection {
     West,
 }
 
-// #[derive(Debug)]
-// enum InterCardinalDirection {
-//     NorthEast,
-//     SouthEast,
-//     SouthWest,
-//     NorthWest
-// }
+#[derive(Debug)]
+enum Orientation {
+    LeftRightDiagonal,
+    RightLeftDiagonal,
+}
